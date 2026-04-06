@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SkillMap — CS/IT Job Readiness</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f7f4;--surface:#fff;--surface2:#f1f0ec;--border:#e4e2dc;
+  --text:#1a1917;--text2:#6b6860;--text3:#9c9a94;
+  --blue:#2563eb;--blue-l:#eff6ff;--blue-d:#1d4ed8;
+  --green:#16a34a;--green-l:#f0fdf4;
+  --red:#dc2626;--red-l:#fef2f2;
+  --orange:#ea580c;--purple:#7c3aed;--purple-l:#faf5ff;
+  --r:12px;--rl:20px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1100px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--text)}
+.logo strong{color:var(--blue);font-weight:800}
+.logo-icon{width:36px;height:36px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff}
+.nav-links{display:flex;gap:4px}
+.nbtn{padding:7px 16px;border:none;border-radius:8px;background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s}
+.nbtn:hover{background:var(--surface2);color:var(--text)}
+.nbtn.active{background:var(--blue);color:#fff}
+
+/* PAGES */
+.page{display:none;max-width:1100px;margin:0 auto;padding:48px 24px 80px}
+.page.active{display:block}
+
+/* HOME */
+.hero{text-align:center;padding:60px 0 48px;max-width:700px;margin:0 auto 64px}
+.hero-badge{display:inline-block;padding:5px 16px;background:var(--blue-l);color:var(--blue);border-radius:20px;font-size:13px;font-weight:500;margin-bottom:20px;border:1px solid #bfdbfe}
+.hero-title{font-family:'Syne',sans-serif;font-size:clamp(34px,5vw,54px);font-weight:800;line-height:1.1;letter-spacing:-.02em;margin-bottom:20px}
+.hero-title span{color:var(--blue)}
+.hero-sub{font-size:17px;color:var(--text2);line-height:1.7;margin-bottom:32px}
+.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:40px}
+.btn-primary{padding:14px 28px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .15s}
+.btn-primary:hover{background:var(--blue-d);transform:translateY(-1px)}
+.btn-ghost{padding:14px 28px;background:transparent;color:var(--text);border:1.5px solid var(--border);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .15s}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-l)}
+.hero-stats{display:flex;align-items:center;justify-content:center;gap:20px}
+.stat strong{display:block;font-family:'Syne',sans-serif;font-size:28px;font-weight:800}
+.stat span{font-size:12px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.stat-div{width:1px;height:36px;background:var(--border)}
+.feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:48px}
+.feat{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:24px;transition:all .2s}
+.feat:hover{box-shadow:0 4px 12px rgba(0,0,0,.08);transform:translateY(-2px)}
+.feat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.fi-blue{background:var(--blue-l);color:var(--blue)}
+.fi-green{background:var(--green-l);color:var(--green)}
+.fi-orange{background:#fff7ed;color:var(--orange)}
+.fi-purple{background:var(--purple-l);color:var(--purple)}
+.feat h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px}
+.feat p{font-size:14px;color:var(--text2);line-height:1.6}
+.bprev{text-align:center}
+.bprev h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;margin-bottom:16px}
+.branch-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.pill{padding:8px 18px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:14px;color:var(--text2);font-weight:500}
+
+/* PAGE HEADER */
+.ph{margin-bottom:32px}
+.ph h2{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em}
+.ph p{font-size:15px;color:var(--text2);margin-top:6px}
+
+/* ANALYZER */
+.alayout{display:grid;grid-template-columns:360px 1fr;gap:24px;align-items:start}
+@media(max-width:900px){.alayout{grid-template-columns:1fr}}
+
+/* STEP CARDS */
+.scard{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:24px;margin-bottom:16px;transition:opacity .2s}
+.snum{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.stitle{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:16px}
+.bgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.jgrid{display:grid;grid-template-columns:1fr;gap:6px}
+.bbtn,.jbtn{padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;text-align:left}
+.bbtn:hover,.jbtn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-l)}
+.bbtn.active,.jbtn.active{border-color:var(--blue);background:var(--blue);color:#fff;font-weight:600}
+.ph-text{font-size:13px;color:var(--text3);font-style:italic}
+
+/* SKILL INPUT */
+.sirow{display:flex;gap:8px;margin-bottom:12px}
+input[type=text]{padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--bg);outline:none;transition:border-color .15s;width:100%}
+input[type=text]:focus{border-color:var(--blue);background:#fff}
+.addbtn{padding:10px 18px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background .15s}
+.addbtn:hover{background:var(--blue-d)}
+.tags-area{min-height:44px;display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;padding:8px 0;margin-bottom:16px}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:var(--blue-l);border:1px solid #bfdbfe;border-radius:20px;font-size:13px;color:var(--blue-d);font-weight:500}
+.tag-x{cursor:pointer;color:var(--blue);font-size:15px;line-height:1;opacity:.6;border:none;background:none;font-family:inherit;padding:0;transition:opacity .15s}
+.tag-x:hover{opacity:1}
+.anzbtn{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
+.anzbtn:hover:not(:disabled){background:var(--blue-d);transform:translateY(-1px)}
+.anzbtn:disabled{background:#93c5fd;cursor:not-allowed;opacity:.7}
+
+/* EMPTY STATE */
+.empty{height:400px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:var(--surface);border:1.5px dashed var(--border);border-radius:var(--rl);color:var(--text3)}
+.empty-icon{width:64px;height:64px;background:var(--surface2);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--text3)}
+.empty p{font-size:14px;line-height:1.7}
+
+/* SCORE CARD */
+.score-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:16px}
+.score-job{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.01em;margin-bottom:4px}
+.score-branch{font-size:13px;color:var(--text3);font-weight:500;margin-bottom:10px}
+.sbadge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.sb-ready{background:var(--green-l);color:var(--green);border:1px solid #bbf7d0}
+.sb-dev{background:#fffbeb;color:#d97706;border:1px solid #fde68a}
+.sb-gap{background:var(--red-l);color:var(--red);border:1px solid #fecaca}
+.ring-wrap{position:relative;flex-shrink:0}
+.ring-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--blue)}
+
+/* RESULT TABS */
+.rtabs{display:flex;gap:4px;background:var(--surface2);border-radius:12px;padding:4px;margin-bottom:16px}
+.rtab{flex:1;padding:8px;border:none;border-radius:8px;background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.rtab.active{background:#fff;color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,.08);font-weight:600}
+.rtab-content{display:none}
+.rtab-content.active{display:block}
+
+/* OVERVIEW */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.mini-card{border-radius:var(--r);padding:16px;border:1px solid}
+.gc{background:var(--green-l);border-color:#bbf7d0}
+.rc{background:var(--red-l);border-color:#fecaca}
+.mc-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px}
+.scl{font-size:13px;line-height:2}
+.shave{color:var(--green)}
+.smiss{color:var(--red)}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px}
+.cc-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:12px}
+.chart-wrap{position:relative;height:280px}
+
+/* GAPS */
+.gaps-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
+.gaps-hdr{display:grid;grid-template-columns:1fr 90px 110px;gap:12px;padding:12px 20px;background:var(--surface2);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)}
+.gap-row{display:grid;grid-template-columns:1fr 90px 110px;gap:12px;align-items:center;padding:12px 20px;border-top:1px solid var(--border)}
+.gap-name{font-size:14px;font-weight:500}
+.ghave{color:var(--green);font-size:12px;font-weight:600}
+.gneed{color:var(--red);font-size:12px;font-weight:600}
+.gbar-w{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.gbar{height:100%;border-radius:3px}
+
+/* RESOURCES */
+.res-intro{font-size:14px;color:var(--text2);margin-bottom:16px}
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.res-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;transition:all .15s}
+.res-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08);transform:translateY(-2px)}
+.res-skill-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--orange);margin-bottom:8px}
+.res-link{display:inline-flex;align-items:center;gap:4px;color:var(--blue);font-size:13px;text-decoration:none;font-weight:500;margin-top:6px;margin-right:8px}
+.res-link:hover{text-decoration:underline}
+
+/* AI BOX */
+.ai-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:24px}
+.ai-hdr{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.ai-av{width:36px;height:36px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.ai-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.ai-sub{font-size:12px;color:var(--text3)}
+.ai-loading{display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;background:var(--blue);border-radius:50%;display:inline-block;animation:pulse 1.2s ease-in-out infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,60%,100%{transform:translateY(0);opacity:.3}30%{transform:translateY(-5px);opacity:1}}
+.lt{font-size:13px;color:var(--text3);margin-left:4px}
+.ai-text{font-size:14px;color:var(--text2);line-height:1.8;white-space:pre-wrap}
+
+/* CHAT */
+.chat-wrap{max-width:760px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);display:flex;flex-direction:column;height:600px}
+.chat-msgs{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px}
+.chat-msgs::-webkit-scrollbar{width:4px}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.cmsg{display:flex;align-items:flex-start;gap:10px}
+.cmsg.user{flex-direction:row-reverse}
+.cav{width:32px;height:32px;border-radius:8px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.cmsg.user .cav{background:var(--surface2);color:var(--text2)}
+.cbubble{max-width:80%;padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.7}
+.cmsg.ai .cbubble{background:var(--surface2);color:var(--text);border-bottom-left-radius:4px}
+.cmsg.user .cbubble{background:var(--blue);color:#fff;border-bottom-right-radius:4px}
+.chat-input-area{border-top:1px solid var(--border);padding:16px}
+.sq-wrap{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.sq{padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s}
+.sq:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-l)}
+.ci-row{display:flex;gap:8px}
+.send-btn{padding:10px 16px;background:var(--blue);color:#fff;border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0}
+.send-btn:hover{background:var(--blue-d)}
+
+@media(max-width:600px){
+  .two-col{grid-template-columns:1fr}
+  .rtabs{flex-wrap:wrap}
+  .score-card{flex-direction:column;text-align:center}
+  .nav-links{gap:2px}
+  .nbtn{padding:6px 10px;font-size:13px}
+  .gaps-hdr span:last-child,.gap-row .gbar-w{display:none}
+  .gaps-hdr,.gap-row{grid-template-columns:1fr 90px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <span>Skill<strong>Map</strong></span>
+    </div>
+    <div class="nav-links">
+      <button class="nbtn active" onclick="goTo('home')">Home</button>
+      <button class="nbtn" onclick="goTo('analyzer')">Analyzer</button>
+      <button class="nbtn" onclick="goTo('chat')">AI Coach</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HOME -->
+<section id="pg-home" class="page active">
+  <div class="hero">
+    <div class="hero-badge">For CS &amp; IT Students 🎓</div>
+    <h1 class="hero-title">Know exactly what<br/><span>skills you're missing</span></h1>
+    <p class="hero-sub">Pick your branch, choose your dream job, add what you know — get your readiness score, gap chart, and a free study plan. Simple.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="goTo('analyzer')">Start Analyzing →</button>
+      <button class="btn-ghost" onclick="goTo('chat')">Chat with AI Coach</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><strong>20+</strong><span>Job Roles</span></div>
+      <div class="stat-div"></div>
+      <div class="stat"><strong>8</strong><span>Branches</span></div>
+      <div class="stat-div"></div>
+      <div class="stat"><strong>Free</strong><span>Always</span></div>
+    </div>
+  </div>
+  <div class="feats">
+    <div class="feat">
+      <div class="feat-icon fi-blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <h3>Readiness Score</h3>
+      <p>Get a % score showing exactly how job-ready you are for any role you pick.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon fi-green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20M6 20V10l6-8 6 8v10"/></svg></div>
+      <h3>Visual Skill Radar</h3>
+      <p>See your coverage vs requirements on a radar chart — know your weak spots instantly.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon fi-orange"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+      <h3>Free Resources</h3>
+      <p>Every missing skill links to the best free platform — freeCodeCamp, CS50, TryHackMe &amp; more.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon fi-purple"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <h3>AI Career Coach</h3>
+      <p>Ask anything — what to learn, interview prep, roadmaps, salary, companies to target.</p>
+    </div>
+  </div>
+  <div class="bprev">
+    <h2>Branches Covered</h2>
+    <div class="branch-pills">
+      <span class="pill">CSE</span><span class="pill">IT</span><span class="pill">ECE</span>
+      <span class="pill">MCA</span><span class="pill">BCA</span><span class="pill">Data Science</span>
+      <span class="pill">Cybersecurity</span><span class="pill">AI / ML</span>
+    </div>
+  </div>
+</section>
+
+<!-- ANALYZER -->
+<section id="pg-analyzer" class="page">
+  <div class="ph">
+    <h2>Skill Gap Analyzer</h2>
+    <p>3 steps to know your job readiness</p>
+  </div>
+  <div class="alayout">
+    <!-- LEFT -->
+    <div>
+      <div class="scard">
+        <div class="snum">Step 01</div>
+        <div class="stitle">Choose Your Branch</div>
+        <div class="bgrid" id="branchGrid"></div>
+      </div>
+      <div class="scard" id="step2" style="opacity:.4;pointer-events:none">
+        <div class="snum">Step 02</div>
+        <div class="stitle">Pick Your Target Job</div>
+        <div class="jgrid" id="jobGrid"><span class="ph-text">Select a branch first</span></div>
+      </div>
+      <div class="scard" id="step3" style="opacity:.4;pointer-events:none">
+        <div class="snum">Step 03</div>
+        <div class="stitle">Add Your Skills</div>
+        <div class="sirow">
+          <input type="text" id="skillInput" placeholder="e.g. Python, React, Docker…" onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill()}"/>
+          <button class="addbtn" onclick="addSkill()">Add</button>
+        </div>
+        <div class="tags-area" id="tagsArea"><span class="ph-text">No skills added yet</span></div>
+        <button class="anzbtn" id="anzBtn" onclick="runAnalysis()" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Analyze My Readiness
+        </button>
+      </div>
+    </div>
+    <!-- RIGHT -->
+    <div>
+      <div class="empty" id="emptyState">
+        <div class="empty-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div>
+        <p>Complete the 3 steps<br/>to see your analysis here</p>
+      </div>
+      <div id="resultsPanel" style="display:none">
+        <!-- Score -->
+        <div class="score-card">
+          <div>
+            <div class="score-job" id="scoreJob">—</div>
+            <div class="score-branch" id="scoreBranch">—</div>
+            <div id="scoreBadge"></div>
+          </div>
+          <div class="ring-wrap">
+            <svg viewBox="0 0 120 120" width="120" height="120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#e5e7eb" stroke-width="10"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#2563eb" stroke-width="10"
+                stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314"
+                id="ringCircle" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset 1s ease"/>
+            </svg>
+            <div class="ring-overlay"><span id="scoreNum">0%</span></div>
+          </div>
+        </div>
+        <!-- Tabs -->
+        <div class="rtabs">
+          <button class="rtab active" onclick="rTab('overview',this)">Overview</button>
+          <button class="rtab" onclick="rTab('gaps',this)">Skill Gaps</button>
+          <button class="rtab" onclick="rTab('resources',this)">Resources</button>
+          <button class="rtab" onclick="rTab('ai',this)">AI Insight</button>
+        </div>
+        <!-- Overview -->
+        <div class="rtab-content active" id="rt-overview">
+          <div class="two-col">
+            <div class="mini-card gc"><div class="mc-lbl">Skills you have ✓</div><div class="scl" id="matchedList"></div></div>
+            <div class="mini-card rc"><div class="mc-lbl">Skills you need ✗</div><div class="scl" id="missingList"></div></div>
+          </div>
+          <div class="chart-card"><div class="cc-lbl">Competency Radar</div><div class="chart-wrap"><canvas id="radarChart"></canvas></div></div>
+        </div>
+        <!-- Gaps -->
+        <div class="rtab-content" id="rt-gaps">
+          <div class="gaps-card">
+            <div class="gaps-hdr"><span>Skill</span><span>Status</span><span>Coverage</span></div>
+            <div id="gapRows"></div>
+          </div>
+        </div>
+        <!-- Resources -->
+        <div class="rtab-content" id="rt-resources">
+          <p class="res-intro" id="resIntro"></p>
+          <div class="res-grid" id="resGrid"></div>
+        </div>
+        <!-- AI -->
+        <div class="rtab-content" id="rt-ai">
+          <div class="ai-box">
+            <div class="ai-hdr">
+              <div class="ai-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.071 4.929A10 10 0 1 1 4.93 19.07"/></svg></div>
+              <div><div class="ai-title">AI Career Coach</div><div class="ai-sub">Personalized advice by Claude AI</div></div>
+            </div>
+            <div class="ai-loading" id="aiLoad"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="lt">Analyzing your profile…</span></div>
+            <div class="ai-text" id="aiText" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAT -->
+<section id="pg-chat" class="page">
+  <div class="ph">
+    <h2>AI Career Coach</h2>
+    <p>Ask anything about jobs, skills, roadmaps, or interviews</p>
+  </div>
+  <div class="chat-wrap">
+    <div class="chat-msgs" id="chatMsgs">
+      <div class="cmsg ai">
+        <div class="cav">AI</div>
+        <div class="cbubble">Hi! I'm your AI career coach for CS/IT students. Ask me anything — roadmaps, skills to learn, interview tips, salary info, which companies to target, or anything else!</div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="sq-wrap" id="sqWrap">
+        <button class="sq" onclick="useSQ(this)">What skills do frontend devs need in 2025?</button>
+        <button class="sq" onclick="useSQ(this)">How do I prepare for DSA interviews?</button>
+        <button class="sq" onclick="useSQ(this)">Best free resources for learning DevOps?</button>
+        <button class="sq" onclick="useSQ(this)">Which pays more — data science or cloud?</button>
+      </div>
+      <div class="ci-row">
+        <input type="text" id="chatInput" placeholder="Type your question…" onkeydown="if(event.key==='Enter')sendChat()"/>
+        <button class="send-btn" onclick="sendChat()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ═══════════════ DATA ═══════════════
+const BRANCHES={
+  'CSE':['Frontend Dev','Backend Dev','Full Stack Dev','Data Scientist','ML Engineer','DevOps Engineer','Cybersecurity Analyst','Cloud Engineer'],
+  'IT':['System Admin','Network Engineer','IT Support','Cloud Engineer','DevOps Engineer','Database Admin'],
+  'ECE':['Embedded Engineer','IoT Developer','VLSI Engineer','Signal Processing Engineer'],
+  'MCA':['Full Stack Dev','Backend Dev','Data Analyst','Software Tester'],
+  'BCA':['Frontend Dev','Full Stack Dev','Software Tester','Data Analyst'],
+  'Data Science':['Data Scientist','Data Analyst','ML Engineer','BI Developer'],
+  'Cybersecurity':['Cybersecurity Analyst','Ethical Hacker','SOC Analyst','Security Engineer'],
+  'AI / ML':['ML Engineer','Data Scientist','AI Research Engineer','NLP Engineer'],
+};
+
+const JOBS={
+  'Frontend Dev':{s:['HTML','CSS','JavaScript','React','TypeScript','Git','REST APIs','Responsive Design','Webpack/Vite','Testing'],w:[10,10,10,9,8,8,7,8,6,6]},
+  'Backend Dev':{s:['Python/Java','Node.js','SQL','REST APIs','System Design','Git','Docker','Authentication','Caching','Cloud Basics'],w:[10,9,9,10,9,8,8,8,7,7]},
+  'Full Stack Dev':{s:['JavaScript','React','Node.js','SQL','REST APIs','Git','Docker','TypeScript','System Design','Cloud Basics'],w:[10,9,9,9,9,8,8,8,8,7]},
+  'Data Scientist':{s:['Python','Statistics','Machine Learning','Pandas/NumPy','Data Visualization','SQL','Feature Engineering','Model Evaluation','Deep Learning','Communication'],w:[10,10,10,9,9,9,8,9,7,8]},
+  'ML Engineer':{s:['Python','Machine Learning','Deep Learning','PyTorch/TensorFlow','MLOps','SQL','Docker','Feature Engineering','Model Deployment','Statistics'],w:[10,10,10,9,9,8,8,9,9,8]},
+  'DevOps Engineer':{s:['Linux','Docker','Kubernetes','CI/CD','AWS/Azure/GCP','Bash Scripting','Terraform','Git','Monitoring','Networking'],w:[10,10,9,10,9,9,8,8,8,7]},
+  'Cybersecurity Analyst':{s:['Networking','Linux','Ethical Hacking','SIEM Tools','Vulnerability Assessment','Python/Bash','Incident Response','Firewalls','Compliance','Cryptography'],w:[10,9,10,9,9,8,9,8,7,7]},
+  'Cloud Engineer':{s:['AWS/Azure/GCP','Terraform','Docker','Kubernetes','Networking','Linux','CI/CD','Python','Databases','IAM & Security'],w:[10,9,9,9,9,8,8,7,8,8]},
+  'Data Analyst':{s:['SQL','Excel','Python/R','Data Visualization','Power BI/Tableau','Statistics','Data Cleaning','Business Acumen','Communication','Storytelling'],w:[10,9,9,9,9,9,8,8,8,7]},
+  'System Admin':{s:['Linux/Windows','Networking','Active Directory','Bash Scripting','Virtualization','Backup & Recovery','Monitoring','Cloud Basics','Security Basics','Troubleshooting'],w:[10,9,9,8,8,8,8,7,8,9]},
+  'Network Engineer':{s:['TCP/IP','Routing & Switching','Cisco IOS','Firewalls','VPN','Network Security','Wireshark','VLAN','BGP/OSPF','Linux'],w:[10,10,9,9,9,8,8,8,7,7]},
+  'Embedded Engineer':{s:['C/C++','Microcontrollers','RTOS','Embedded Linux','Hardware Protocols','Debugging','Python','Circuit Design','FPGA','Assembly'],w:[10,10,9,9,9,9,7,8,7,6]},
+  'IoT Developer':{s:['Python','C/C++','MQTT','Arduino/Raspberry Pi','Cloud IoT','Networking','Embedded Linux','REST APIs','Data Analytics','Security'],w:[10,9,9,9,9,8,8,8,7,7]},
+  'Database Admin':{s:['SQL','MySQL/PostgreSQL','Database Design','Backup & Recovery','Query Optimization','NoSQL','Replication','Cloud Databases','Linux','Scripting'],w:[10,10,10,9,9,8,8,8,7,7]},
+  'Software Tester':{s:['Manual Testing','Selenium','Test Cases','JIRA','API Testing','SQL','Agile/Scrum','Bug Reporting','Python/Java','Performance Testing'],w:[10,9,9,9,9,8,8,8,7,7]},
+  'BI Developer':{s:['Power BI','Tableau','SQL','Data Warehousing','ETL Pipelines','Python/R','Excel','Data Modeling','DAX','Business Acumen'],w:[10,9,10,9,9,8,9,9,8,8]},
+  'Ethical Hacker':{s:['Networking','Linux','Penetration Testing','Python/Bash','OWASP/Web Security','Metasploit','Wireshark','Cryptography','Social Engineering','Report Writing'],w:[10,9,10,9,10,9,8,8,7,7]},
+  'SOC Analyst':{s:['SIEM Tools','Networking','Linux','Incident Response','Malware Analysis','Log Analysis','Threat Intelligence','Python','Vulnerability Scanning','Compliance'],w:[10,9,9,10,9,9,8,8,8,7]},
+  'Security Engineer':{s:['Networking','Cloud Security','IAM','Penetration Testing','Python','DevSecOps','Cryptography','Compliance','Firewalls','Linux'],w:[10,9,9,9,8,8,8,7,8,9]},
+  'AI Research Engineer':{s:['Python','Deep Learning','Research Papers','PyTorch/TensorFlow','Mathematics','NLP','Computer Vision','Model Architecture','Statistics','Technical Writing'],w:[10,10,9,10,10,9,8,9,10,8]},
+  'NLP Engineer':{s:['Python','NLP/NLTK/spaCy','Transformers/BERT','Deep Learning','SQL','PyTorch/TensorFlow','Text Preprocessing','Model Evaluation','APIs','Statistics'],w:[10,10,10,9,8,9,9,8,7,8]},
+  'VLSI Engineer':{s:['Verilog/VHDL','Digital Logic','FPGA','Cadence/Synopsys','C++','Circuit Design','RTL Design','Timing Analysis','Embedded Systems','Semiconductors'],w:[10,10,9,9,7,9,10,9,7,8]},
+  'Signal Processing Engineer':{s:['MATLAB','Python','DSP Fundamentals','Fourier Transforms','Filter Design','C++','Communication Systems','Machine Learning','FPGA','Mathematics'],w:[10,9,10,9,9,8,8,7,7,9]},
+  'IT Support':{s:['Troubleshooting','Windows/MacOS','Networking Basics','Active Directory','Customer Service','Hardware','Linux Basics','Cloud Basics','Ticketing Systems','Documentation'],w:[10,9,9,8,9,9,7,7,8,8]},
+};
+
+const RESOURCES={
+  'HTML':[{n:'MDN Web Docs',u:'https://developer.mozilla.org/en-US/docs/Web/HTML'},{n:'freeCodeCamp HTML',u:'https://www.freecodecamp.org/learn/2022/responsive-web-design/'}],
+  'CSS':[{n:'CSS Tricks',u:'https://css-tricks.com'},{n:'freeCodeCamp CSS',u:'https://www.freecodecamp.org/learn'}],
+  'JavaScript':[{n:'javascript.info (free)',u:'https://javascript.info'},{n:'Eloquent JavaScript',u:'https://eloquentjavascript.net'}],
+  'React':[{n:'React Official Docs',u:'https://react.dev'},{n:'Scrimba React Course',u:'https://scrimba.com/learn/learnreact'}],
+  'TypeScript':[{n:'TypeScript Handbook',u:'https://www.typescriptlang.org/docs/handbook/intro.html'}],
+  'Python':[{n:'Python Docs Tutorial',u:'https://docs.python.org/3/tutorial/'},{n:'CS50P Harvard (free)',u:'https://cs50.harvard.edu/python/'}],
+  'SQL':[{n:'SQLZoo Interactive',u:'https://sqlzoo.net'},{n:'Mode SQL Tutorial',u:'https://mode.com/sql-tutorial/'}],
+  'Node.js':[{n:'Node.js Docs',u:'https://nodejs.org/en/docs'},{n:'The Odin Project',u:'https://www.theodinproject.com'}],
+  'Docker':[{n:'Docker Get Started',u:'https://docs.docker.com/get-started/'},{n:'Play with Docker',u:'https://labs.play-with-docker.com'}],
+  'Kubernetes':[{n:'Kubernetes Docs',u:'https://kubernetes.io/docs/home/'},{n:'K8s the Hard Way',u:'https://github.com/kelseyhightower/kubernetes-the-hard-way'}],
+  'AWS/Azure/GCP':[{n:'AWS Skill Builder (free)',u:'https://skillbuilder.aws'},{n:'Google Cloud Training',u:'https://cloud.google.com/training'}],
+  'Machine Learning':[{n:'Google ML Crash Course',u:'https://developers.google.com/machine-learning/crash-course'},{n:'fast.ai (free)',u:'https://course.fast.ai'}],
+  'Deep Learning':[{n:'fast.ai Deep Learning',u:'https://course.fast.ai'},{n:'deeplearning.ai',u:'https://www.deeplearning.ai'}],
+  'PyTorch/TensorFlow':[{n:'PyTorch Tutorials',u:'https://pytorch.org/tutorials/'},{n:'TensorFlow Learn',u:'https://www.tensorflow.org/learn'}],
+  'Git':[{n:'Pro Git Book (free)',u:'https://git-scm.com/book/en/v2'},{n:'GitHub Skills',u:'https://skills.github.com'}],
+  'Linux':[{n:'Linux Journey (free)',u:'https://linuxjourney.com'},{n:'The Linux Command Line',u:'https://linuxcommand.org/tlcl.php'}],
+  'Networking':[{n:'Cisco NetAcad (free)',u:'https://www.netacad.com'},{n:'Professor Messer',u:'https://www.professormesser.com'}],
+  'Statistics':[{n:'Khan Academy Stats',u:'https://www.khanacademy.org/math/statistics-probability'},{n:'StatQuest YouTube',u:'https://www.youtube.com/@statquest'}],
+  'Power BI/Tableau':[{n:'Microsoft Power BI Learn',u:'https://learn.microsoft.com/en-us/power-bi/'},{n:'Tableau Free Training',u:'https://www.tableau.com/learn/training'}],
+  'Ethical Hacking':[{n:'TryHackMe (free tier)',u:'https://tryhackme.com'},{n:'Hack The Box',u:'https://www.hackthebox.com'}],
+  'Penetration Testing':[{n:'TryHackMe (free tier)',u:'https://tryhackme.com'},{n:'PortSwigger Web Security',u:'https://portswigger.net/web-security'}],
+  'C/C++':[{n:'LearnCpp.com (free)',u:'https://www.learncpp.com'},{n:'CS50x Harvard (free)',u:'https://cs50.harvard.edu/x/'}],
+  'Terraform':[{n:'HashiCorp Tutorials',u:'https://developer.hashicorp.com/terraform/tutorials'}],
+  'CI/CD':[{n:'GitHub Actions Docs',u:'https://docs.github.com/en/actions'},{n:'GitLab CI Tutorial',u:'https://docs.gitlab.com/ee/ci/'}],
+  'System Design':[{n:'System Design Primer',u:'https://github.com/donnemartin/system-design-primer'},{n:'ByteByteGo',u:'https://bytebytego.com'}],
+  'SIEM Tools':[{n:'Splunk Free Training',u:'https://www.splunk.com/en_us/training/free-courses.html'}],
+  'Verilog/VHDL':[{n:'NANDLAND FPGA Tutorials',u:'https://nandland.com'},{n:'HDLBits Verilog Practice',u:'https://hdlbits.01xz.net/wiki/Main_Page'}],
+  'MATLAB':[{n:'MATLAB Onramp (free)',u:'https://matlabacademy.mathworks.com/details/matlab-onramp/gettingstarted'}],
+  'NLP/NLTK/spaCy':[{n:'spaCy Course (free)',u:'https://course.spacy.io'},{n:'HuggingFace NLP Course',u:'https://huggingface.co/learn/nlp-course'}],
+  'DEFAULT':[{n:'freeCodeCamp (free)',u:'https://www.freecodecamp.org'},{n:'The Odin Project (free)',u:'https://www.theodinproject.com'}],
+};
+
+const ALIAS={
+  'js':'javascript','ts':'typescript','reactjs':'react','vuejs':'react','nextjs':'react','next.js':'react','angular':'react',
+  'node':'node.js','nodejs':'node.js','express':'node.js','django':'python/java','flask':'python/java','fastapi':'python/java',
+  'java':'python/java','spring':'python/java','go':'python/java','golang':'python/java',
+  'mysql':'sql','postgresql':'sql','postgres':'sql','sqlite':'sql',
+  'mongodb':'nosql','mongo':'nosql','redis':'caching','cassandra':'nosql',
+  'aws':'aws/azure/gcp','azure':'aws/azure/gcp','gcp':'aws/azure/gcp','google cloud':'aws/azure/gcp',
+  'k8s':'kubernetes','helm':'kubernetes',
+  'ubuntu':'linux','kali':'linux','bash':'bash scripting','shell scripting':'bash scripting','powershell':'bash scripting',
+  'github':'git','gitlab':'git','bitbucket':'git',
+  'ml':'machine learning','ai':'machine learning',
+  'pytorch':'pytorch/tensorflow','tensorflow':'pytorch/tensorflow','keras':'pytorch/tensorflow',
+  'pandas':'pandas/numpy','numpy':'pandas/numpy',
+  'matplotlib':'data visualization','seaborn':'data visualization','plotly':'data visualization',
+  'power bi':'power bi/tableau','powerbi':'power bi/tableau','tableau':'power bi/tableau','looker':'power bi/tableau',
+  'metasploit':'penetration testing','burp suite':'penetration testing','nmap':'penetration testing',
+  'splunk':'siem tools','elastic':'siem tools',
+  'arduino':'arduino/raspberry pi','raspberry pi':'arduino/raspberry pi','rpi':'arduino/raspberry pi',
+  'verilog':'verilog/vhdl','vhdl':'verilog/vhdl',
+  'c++':'c/c++','cpp':'c/c++',
+  'bert':'transformers/bert','gpt':'transformers/bert','llm':'transformers/bert',
+  'nltk':'nlp/nltk/spacy','spacy':'nlp/nltk/spacy','nlp':'nlp/nltk/spacy',
+  'html5':'html','css3':'css','sass':'css','tailwind':'css','bootstrap':'css',
+  'webpack':'webpack/vite','vite':'webpack/vite',
+  'graphql':'rest apis','api':'rest apis',
+  'airflow':'etl pipelines','kafka':'etl pipelines','spark':'etl pipelines',
+  'selenium':'selenium','cypress':'selenium','playwright':'selenium',
+  'postman':'api testing','insomnia':'api testing',
+  'agile':'agile/scrum','scrum':'agile/scrum',
+  'r':'python/r','statistics':'statistics','probability':'statistics',
+  'vmware':'virtualization','virtualbox':'virtualization',
+  'fpga':'fpga','xilinx':'fpga',
+  'dsp':'dsp fundamentals','signal processing':'dsp fundamentals',
+};
+
+// ═══════════════ STATE ═══════════════
+let branch=null, job=null, skills=[], chartInst=null, chatHist=[];
+
+// ═══════════════ NAV ═══════════════
+function goTo(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nbtn').forEach(x=>x.classList.remove('active'));
+  document.getElementById('pg-'+p).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ═══════════════ MATCHING ═══════════════
+function norm(s){return s.toLowerCase().trim();}
+function alias(s){return ALIAS[norm(s)]||norm(s);}
+function matches(u,r){
+  const un=norm(u),rn=norm(r),ua=alias(u);
+  if(un===rn||ua===rn||rn.includes(ua)||ua.includes(rn)||un.includes(rn)||rn.includes(un)) return true;
+  const uw=un.split(/[\s\/\(\)\-\.]+/).filter(w=>w.length>2);
+  const rw=rn.split(/[\s\/\(\)\-\.]+/).filter(w=>w.length>2);
+  for(const a of uw) for(const b of rw) if(a===b||(a.length>3&&b.length>3&&(a.includes(b)||b.includes(a)))) return true;
+  return false;
+}
+function has(req){return skills.some(s=>matches(s,req));}
+
+// ═══════════════ BRANCHES / JOBS ═══════════════
+function buildBranches(){
+  document.getElementById('branchGrid').innerHTML=Object.keys(BRANCHES).map(b=>
+    `<button class="bbtn" onclick="selBranch('${b}')">${b}</button>`
+  ).join('');
+}
+
+function selBranch(b){
+  branch=b; job=null;
+  document.querySelectorAll('.bbtn').forEach(x=>x.classList.toggle('active',x.textContent===b));
+  document.getElementById('jobGrid').innerHTML=BRANCHES[b].map(j=>
+    `<button class="jbtn" onclick="selJob('${j}')">${j}</button>`
+  ).join('');
+  document.getElementById('step2').style.opacity='1';
+  document.getElementById('step2').style.pointerEvents='auto';
+  checkBtn();
+}
+
+function selJob(j){
+  job=j;
+  document.querySelectorAll('.jbtn').forEach(x=>x.classList.toggle('active',x.textContent===j));
+  document.getElementById('step3').style.opacity='1';
+  document.getElementById('step3').style.pointerEvents='auto';
+  checkBtn();
+  if(document.getElementById('resultsPanel').style.display!=='none') runAnalysis();
+}
+
+// ═══════════════ SKILLS ═══════════════
+function addSkill(){
+  const inp=document.getElementById('skillInput');
+  const v=inp.value.trim();
+  if(!v) return;
+  if(skills.find(s=>s.toLowerCase()===v.toLowerCase())){inp.value='';inp.focus();return;}
+  skills.push(v); inp.value=''; inp.focus();
+  renderTags(); checkBtn();
+  if(document.getElementById('resultsPanel').style.display!=='none') runAnalysis();
+}
+
+function removeSkill(i){
+  skills.splice(i,1); renderTags(); checkBtn();
+  if(document.getElementById('resultsPanel').style.display!=='none') runAnalysis();
+}
+
+function renderTags(){
+  const a=document.getElementById('tagsArea');
+  if(!skills.length){a.innerHTML='<span class="ph-text">No skills added yet</span>';return;}
+  a.innerHTML=skills.map((s,i)=>
+    `<span class="tag">${s}<button class="tag-x" onclick="removeSkill(${i})">×</button></span>`
+  ).join('');
+}
+
+function checkBtn(){
+  document.getElementById('anzBtn').disabled=!(job&&skills.length>0);
+}
+
+// ═══════════════ ANALYSIS ═══════════════
+function runAnalysis(){
+  if(!job||!skills.length) return;
+  const {s:req,w:imp}=JOBS[job];
+  const totalW=imp.reduce((a,b)=>a+b,0);
+  let earnedW=0;
+  const matched=[],missing=[];
+  req.forEach((r,i)=>{
+    if(has(r)){earnedW+=imp[i];matched.push({name:r,imp:imp[i]});}
+    else{missing.push({name:r,imp:imp[i]});}
+  });
+  const pct=Math.round(earnedW/totalW*100);
+
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('resultsPanel').style.display='block';
+
+  // Score card
+  document.getElementById('scoreJob').textContent=job;
+  document.getElementById('scoreBranch').textContent=branch;
+  animNum('scoreNum',0,pct,900);
+  const circle=document.getElementById('ringCircle');
+  circle.style.strokeDashoffset=314-(pct/100*314);
+  circle.style.stroke=pct>=80?'#16a34a':pct>=50?'#d97706':'#dc2626';
+  const sb=document.getElementById('scoreBadge');
+  if(pct>=80) sb.innerHTML='<span class="sbadge sb-ready">Job Ready</span>';
+  else if(pct>=50) sb.innerHTML='<span class="sbadge sb-dev">Developing</span>';
+  else sb.innerHTML='<span class="sbadge sb-gap">Skill Gaps Detected</span>';
+
+  // Overview
+  document.getElementById('matchedList').innerHTML=matched.length
+    ?matched.map(x=>`<span class="shave">✓ ${x.name}</span><br>`).join('')
+    :'<span style="color:var(--text3)">None matched yet</span>';
+  document.getElementById('missingList').innerHTML=missing.length
+    ?missing.map(x=>`<span class="smiss">✗ ${x.name}</span><br>`).join('')
+    :'<span class="shave">✓ All covered!</span>';
+
+  // Radar
+  const ctx=document.getElementById('radarChart').getContext('2d');
+  if(chartInst){chartInst.destroy();chartInst=null;}
+  chartInst=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:req.map(r=>r.length>14?r.slice(0,14)+'…':r),
+      datasets:[
+        {label:'You',data:req.map((r,i)=>has(r)?imp[i]:0),backgroundColor:'rgba(37,99,235,.15)',borderColor:'#2563eb',borderWidth:2,pointRadius:3,pointBackgroundColor:'#2563eb'},
+        {label:'Required',data:imp,backgroundColor:'rgba(0,0,0,.03)',borderColor:'rgba(0,0,0,.2)',borderDash:[5,5],borderWidth:1.5,pointRadius:0}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{r:{min:0,max:Math.max(...imp)+1,ticks:{display:false},grid:{color:'rgba(0,0,0,.07)'},angleLines:{color:'rgba(0,0,0,.07)'},
+        pointLabels:{font:{size:9,family:'DM Sans'},color:'#9c9a94'}}},
+      plugins:{legend:{display:false}}}
+  });
+
+  // Gaps
+  document.getElementById('gapRows').innerHTML=req.map((r,i)=>{
+    const h=has(r);
+    return`<div class="gap-row">
+      <span class="gap-name">${r}</span>
+      <span class="${h?'ghave':'gneed'}">${h?'✓ Have':'✗ Need'}</span>
+      <div class="gbar-w"><div class="gbar" style="width:${h?100:0}%;background:${h?'#16a34a':'#dc2626'}"></div></div>
+    </div>`;
+  }).join('');
+
+  // Resources
+  const resIntro=document.getElementById('resIntro');
+  const resGrid=document.getElementById('resGrid');
+  if(!missing.length){
+    resIntro.textContent='';
+    resGrid.innerHTML='<div style="font-size:14px;color:var(--text2);padding:20px 0">You already have all required skills — time to apply!</div>';
+  } else {
+    resIntro.textContent=`You are missing ${missing.length} skill${missing.length>1?'s':''}. Here are free resources:`;
+    resGrid.innerHTML=missing.slice(0,8).map(item=>{
+      let res=RESOURCES[item.name];
+      if(!res){
+        const k=Object.keys(RESOURCES).find(k=>{const nk=norm(k);const ni=norm(item.name);return nk===ni||ni.includes(nk)||nk.includes(ni);});
+        res=k?RESOURCES[k]:RESOURCES['DEFAULT'];
+      }
+      return`<div class="res-card">
+        <div class="res-skill-tag">Learn: ${item.name}</div>
+        ${res.map(r=>`<a href="${r.u}" target="_blank" class="res-link">${r.n} →</a>`).join('')}
+      </div>`;
+    }).join('');
+  }
+
+  // AI
+  runAI(pct,matched,missing);
+}
+
+function animNum(id,from,to,dur){
+  const el=document.getElementById(id);
+  let t0=null;
+  const step=ts=>{
+    if(!t0) t0=ts;
+    const p=Math.min((ts-t0)/dur,1);
+    el.textContent=Math.floor(p*(to-from)+from)+'%';
+    if(p<1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+// ═══════════════ RESULT TABS ═══════════════
+function rTab(id,btn){
+  document.querySelectorAll('.rtab-content').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.rtab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('rt-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ═══════════════ AI INSIGHT ═══════════════
+async function runAI(pct,matched,missing){
+  document.getElementById('aiLoad').style.display='flex';
+  document.getElementById('aiText').style.display='none';
+  document.getElementById('aiText').textContent='';
+
+  const prompt=`You are a career coach for CS/IT students in India. Be warm and practical.
+
+Target job: "${job}" (Branch: ${branch})
+Skills they have: ${matched.map(m=>m.name).join(', ')||'none yet'}
+Skills missing: ${missing.map(m=>m.name).join(', ')||'none — fully ready!'}
+Readiness: ${pct}%
+
+Write a concise 3-part analysis (under 200 words):
+1. Quick Assessment (2 sentences)
+2. Top 3 Skills to Learn First (bullet points with one tip each)
+3. Action This Week (one specific step)
+
+Be direct, India-relevant, mention free resources.`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:700,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    const text=data.content?.[0]?.text;
+    document.getElementById('aiLoad').style.display='none';
+    if(text){
+      const box=document.getElementById('aiText');
+      box.style.display='block';box.textContent='';
+      let i=0;const t=setInterval(()=>{box.textContent+=text[i++];if(i>=text.length)clearInterval(t);},10);
+    } else {
+      document.getElementById('aiLoad').style.display='none';
+    }
+  }catch(e){
+    document.getElementById('aiLoad').style.display='none';
+  }
+}
+
+// ═══════════════ CHAT ═══════════════
+function useSQ(btn){
+  document.getElementById('chatInput').value=btn.textContent;
+  document.getElementById('sqWrap').style.display='none';
+  sendChat();
+}
+
+async function sendChat(){
+  const inp=document.getElementById('chatInput');
+  const msg=inp.value.trim();
+  if(!msg) return;
+  inp.value='';
+  addMsg('user',msg);
+  const tid=addTyping();
+  const ctx=job?`Student targets "${job}" in ${branch}. Their skills: ${skills.join(', ')||'not specified'}.`:'';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:700,
+        messages:[{role:'user',content:`You are a friendly career coach for CS/IT students in India. Be practical and concise. ${ctx}\n\nStudent asks: ${msg}`}]})
+    });
+    const data=await res.json();
+    const text=data.content?.[0]?.text||'Sorry, could not get a response. Try again!';
+    removeTyping(tid);
+    addMsg('ai',text);
+  }catch(e){removeTyping(tid);addMsg('ai','Chat temporarily unavailable. Please try again!');}
+}
+
+function addMsg(role,text){
+  const msgs=document.getElementById('chatMsgs');
+  const d=document.createElement('div');
+  d.className='cmsg '+role;
+  d.innerHTML=`<div class="cav">${role==='ai'?'AI':'ME'}</div><div class="cbubble">${text.replace(/\n/g,'<br>')}</div>`;
+  msgs.appendChild(d);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+let tC=0;
+function addTyping(){
+  const id='t'+(++tC);
+  const msgs=document.getElementById('chatMsgs');
+  const d=document.createElement('div');
+  d.className='cmsg ai';d.id=id;
+  d.innerHTML=`<div class="cav">AI</div><div class="cbubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+  return id;
+}
+
+function removeTyping(id){const e=document.getElementById(id);if(e)e.remove();}
+
+// INIT
+buildBranches();
+</script>
+</body>
+</html>
